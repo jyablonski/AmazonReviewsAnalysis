@@ -1,6 +1,8 @@
 # AmazonReviewsAnalysis
 This project goes through my process of analyzing Amazon Reviews to find trends & insights.  The dataset is available here https://registry.opendata.aws/amazon-reviews/.  The data includes a subset of Amazon Reviews related to Video Game products from December 2012 to August 2015.  There are a little over 1+ million rows in the dataset with variables like Product Title, the Headline of the Review, the Body of the Review, Date, and the total amount of Help Votes given to the Review.
 
+I specifically analyzed the entire dataset for this project.  I also contemplated filtering specific Product Titles that were popular (Products like a Playstation 3 or games like Grand Theft Auto: V) which is possible if you're interested in a certain product.
+
 This is just a rough time series of the data, the red lines represent the spikes which typically occur in December & January around the Holiday Season.  There's also a general upward trend as time increases from Amazon becoming more and more popular.  This is pretty normal & exactly what we would expect to see.
 
 ![amazonreviews](https://user-images.githubusercontent.com/16946556/75714753-246ed000-5c81-11ea-8c7a-ef3c175e144e.png)
