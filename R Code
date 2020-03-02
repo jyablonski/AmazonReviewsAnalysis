@@ -1,0 +1,425 @@
+library(tidytext)
+library(tidyverse)
+library(extrafont)
+library(magick)
+library(scales)
+library(lubridate)
+library(igraph)
+library(ggraph)
+library(widyr)
+library(wordcloud)
+library(reshape2)
+library(GGally)
+library(fpp3)
+library(sugrrants)
+
+# The Data - https://registry.opendata.aws/amazon-reviews/
+
+# adjust keyword variable & create system date.
+
+dateVariable <- Sys.Date()
+dateVariable <-  format(dateVariable, format = "%B %d, %Y")
+
+# custom theme
+theme_jacob <- function () { 
+  theme_minimal(base_size=9, base_family="Gill Sans MT") %+replace% 
+    theme(
+      panel.grid.minor = element_blank(),
+      plot.background = element_rect(fill = 'floralwhite', color = 'floralwhite')
+    )
+}
+# Data from 12-11-2012 to 8-31-2015
+df <- read_csv('Amazon Video Game Review Data.csv ')
+
+df2 <- df %>%
+  select(customer_id, product_title, star_rating, helpful_votes, total_votes,
+         verified_purchase, review_headline, review_body, review_date) %>%
+  rename(CustID = customer_id, Title = product_title, Rating = star_rating,
+         HelpVotes = helpful_votes, TotalVotes = total_votes, 
+         VerifiedPurchase = verified_purchase, Headline = review_headline,
+         Review = review_body, Date = review_date) %>%
+  filter(!is.na(Date))
+df2$Date <- mdy(df2$Date)
+df2 <- as.data.frame(df2)
+str(df2)
+  
+  # Top 10 Customers - 1 Customer left 293 Reviews !
+  df2 %>%
+    select(CustID, Review) %>%
+    group_by(CustID) %>%
+    summarise(Count = n()) %>%
+    arrange(desc(Count)) %>%
+    top_n(10)
+  
+  df2 %>%
+    select(Title) %>%
+    group_by(Title) %>%
+    summarise(Count = n()) %>%
+    arrange(desc(Count)) %>%
+    top_n(10)
+
+ggplot(df2, aes(x = Rating)) +
+  geom_histogram() +
+  scale_y_continuous(labels = comma) +
+  theme_jacob()
+
+head(df2$Review)
+
+df2GTAV <- df2 %>%
+  filter(Title == 'Grand Theft Auto V')
+ggplot(df2GTAV, aes(x = Rating)) +
+  geom_histogram() +
+  scale_y_continuous(labels = comma) +
+  labs(title = 'GTA V Ratings') +
+  theme_jacob()
+
+df2PS3 <- df2 %>%
+  filter(Title == 'PlayStation 4 500GB Console [Old Model]')
+
+ggplot(df2PS3, aes(x = Rating)) +
+  geom_histogram() +
+  scale_y_continuous(labels = comma) +
+  labs(title = 'PS3 Ratings') +
+  theme_jacob()
+
+df2 %>%
+  count(is.na(Date))
+
+df2 %>%
+  count(is.na(Rating))
+
+# list of every columns na values.
+colSums(is.na(df2))
+
+ggplot(df2, aes(Date)) +
+  geom_bar() +
+  scale_y_continuous(labels = comma) +
+  scale_x_date(date_breaks = "4 months", date_labels = "%b %Y") +
+  theme_jacob()
+
+df2Feb <- df2 %>%
+  filter(month(Date) == '2')
+
+df2Months <- df2 %>%
+  mutate(Month = yearmonth(Date)) %>%
+  group_by(Month) %>%
+  summarise(Count = n())
+
+df2days <- df2 %>%
+  group_by(Date) %>%
+  summarise(Count = n()) %>%
+  mutate(impDate = ifelse(Count %in% tail(sort(Count), 10), 'Important Date', " "))
+
+ggplot(df2days, aes(Date, Count, fill = impDate)) +
+  geom_bar(stat = 'identity', width = 1.2) +
+  scale_y_continuous(labels = comma) +
+  scale_fill_manual(values = c("#969696", "#de2d26")) +
+  scale_x_date(date_breaks = "4 months", date_labels = "%b %Y") +
+  annotate(geom = 'text', y = 3400, x = as.Date("2015-03-20"),
+           label = "Red Lines Indicate Top 10 Most Popular Days", family = "Gill Sans MT", size = 2.25, hjust = 0.2) +
+  annotate(geom = 'text', y = 3250, x = as.Date("2015-03-20"),
+           label = "(The weeks following Christmas Day)", family = "Gill Sans MT", size = 2.25, hjust = 0.2) +
+  labs(title = "Count of Amazon Video Game Reviews", 
+       subtitle = "Data Ranging from Dec. 2012 - Aug. 2015",
+       x = "Date", 
+       y = "Total Reviews", 
+       caption = "data via Amazon AWS Public Dataset | Created by Jacob Yablonski") + 
+  theme_jacob() +
+  theme(plot.title = element_text(face = 'bold', hjust = .5), 
+        plot.subtitle = element_text(hjust = .5), 
+        legend.position = 'none') 
+ggsave("amazonreviews.png", width = 9, height = 4)
+str(df2days)
+
+
+
+
+# Forecasting next 12 months of Number of Reviews
+dfForecast <- as_tsibble(df2)
+dfForecast <- df2Months %>%
+  as_tsibble(index = Month)
+
+autoplot(dfForecast)
+
+# exponential smoothing - log cost to get rid of potential negative forecast (can't have a negative forecast for this.)
+pfit <- dfForecast %>%
+  model(ETS(log(Count) ~ error("M") + trend("Ad") + season("M")))
+report(pfit)
+abc <- augment(pfit) # fitted values & forecast horizon stuff
+gg_tsresiduals(pfit) # checking residuals.  
+
+fc <- pfit %>%
+  forecast(h = 12)
+
+
+pfit %>%
+  forecast(h = 12) %>%
+  autoplot(dfForecast) +
+  scale_x_date(date_breaks = "4 months", date_labels = "%b %Y") +
+  theme_jacob() +
+  xlab("Year") + ylab("Count") +
+  ggtitle("Number of Monthly Amazon Reviews for Video Game Related Products") +
+  labs(subtitle = 'Exponential Smoothing Forecast (Damped Trend + Seasonality)') +
+  theme_jacob()
+ggsave('amazonexponentialsmoothing.png', width = 9, height = 4)
+
+# ARIMA
+fit_arima <- dfForecast %>%
+  model(ARIMA(Count)) #(1, 0, 0) (0, 1, 0) [12]
+report(fit_arima)
+gg_tsresiduals(fit_arima, lag_max = 6)
+augment(fit_arima) %>%
+  features(.resid, ljung_box, lag = 12, dof = 3) 
+
+fit_arima %>%
+  forecast(h = 12) %>%
+  autoplot(dfForecast) +
+  scale_x_date(date_breaks = "4 months", date_labels = "%b %Y") +
+  xlab("Year") + ylab("Count") +
+  ggtitle("Number of Monthly Amazon Reviews for Video Game Related Products") +
+  labs(subtitle = 'Auto ARIMA Forecast') +
+  theme_jacob()
+ggsave('amazonautoarima.png', width = 9, height = 4)
+  
+# maybe do tidy text on ratings = 1 vs ratings = 5
+# maybe model help ratings number of help votes vs number of words in the text????????
+df2helpRatings <- df2 %>%
+  filter(HelpVotes >= 200)
+
+df2lowRatings <- df2 %>%
+  filter(Rating == 1)
+
+df2highRatings <- df2 %>%
+  filter(Rating == 5)
+
+# Tidy text stuff on Review Body
+dfWords <- df2 %>%
+  dplyr::select(Review) %>%
+  unnest_tokens(word, Review)
+
+# a lot of stop words in the top 15 
+dfWords %>%
+  count(word, sort = TRUE) %>%
+  top_n(15) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(x = word, y = n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip() +
+  labs(x = "Count",
+       y = "Unique words",
+       title = "Count of unique words found in tweets") +
+  theme_jacob()
+
+# filter out the stop words (in, of, as, the etc.)
+data(stop_words)
+nrow(dfWords) # 60,081,053 words before
+
+dfWords <- dfWords %>%
+  anti_join(stop_words)
+nrow(dfWords) # 22,019,080 words after
+
+# top 25words graph - Picture 1
+dfWords %>%
+  count(word, sort = TRUE) %>%
+  top_n(25) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(x = word, y = n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip() +
+  labs(y = "Count",
+       x = "Unique Words",
+       title = "Top 25 Most Popular Words",
+       subtitle = 'Video Game Product Reviews on Amazon',
+       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = "")) +
+  theme_jacob()
+ggsave('amazontop25wordsReviews.png', width = 9, height = 4)
+
+# filter out any noticeable sentiment word that is out of place here ----
+bing_word_counts <- dfWords %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  ungroup()
+
+# Top 15 Graph for each Sentiment - Picture 3
+bing_word_counts %>%
+  group_by(sentiment) %>%
+  top_n(15) %>%
+  ungroup() %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n, fill = sentiment)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~sentiment, scales = "free_y") +
+  labs(y = "Top 15 Most Popular Words Tweeted by Each Sentiment",
+       x = NULL, 
+       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = ""))  +
+  coord_flip() +
+  theme_jacob()
+ggsave('amazontop15Bing.png', width = 9, height = 4)
+
+dfWords %>%
+  count(word) %>%
+  with(wordcloud(word, n, max.words = 50))
+
+dfWords %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  acast(word ~ sentiment, value.var = "n", fill = 0) %>%
+  comparison.cloud(colors = c("red", "blue"),
+                   max.words = 100) +
+  theme_jacob()
+
+# word Counts
+word_counts <- dfWords %>%
+  count(word, sort = TRUE) %>%
+  mutate(total = sum(n))
+
+# Frequency of word counts
+freq_by_rank <- word_counts %>% 
+  mutate(rank = row_number(), 
+         `term frequency` = n/total)
+freq_by_rank
+head(freq_by_rank, 6) # top 6 words include ~19 of all data
+top6 <- sum(head(freq_by_rank$`term frequency`, 6)) * 100
+cat("Top 6 Words represent ", top6, "% of the entire dataset", sep = "" )
+
+
+# Headline Text Mining ----
+dfWordsHeadline <- df2 %>%
+  dplyr::select(Headline) %>%
+  unnest_tokens(word, Headline)
+
+# a lot of stop words in the top 15 
+dfWordsHeadline %>%
+  count(word, sort = TRUE) %>%
+  top_n(15) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(x = word, y = n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip() +
+  labs(x = "Count",
+       y = "Unique words",
+       title = "Count of unique words found in tweets") +
+  theme_jacob()
+
+# filter out the stop words (in, of, as, the etc.)
+data(stop_words)
+nrow(dfWordsHeadline) # 4,160,561 words before
+
+dfWordsHeadline <- dfWordsHeadline %>%
+  anti_join(stop_words)
+nrow(dfWordsHeadline) # 1,924,161 words after
+
+# top 25words graph - Picture 1
+dfWordsHeadline %>%
+  count(word, sort = TRUE) %>%
+  top_n(25) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(x = word, y = n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip() +
+  labs(y = "Count",
+       x = "Unique words",
+       title = "Top 25 Most Popular Words",
+       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = "")) +
+  theme_jacob()
+
+
+# filter out any noticeable sentiment word that is out of place here ----
+bing_word_counts_headline <- dfWordsHeadline %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  ungroup()
+
+# Top 15 Graph for each Sentiment - Picture 3
+bing_word_counts_headline %>%
+  group_by(sentiment) %>%
+  top_n(15) %>%
+  ungroup() %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n, fill = sentiment)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~sentiment, scales = "free_y") +
+  labs(y = "Top 15 Most Popular Words Tweeted by Each Sentiment",
+       x = NULL, 
+       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = ""))  +
+  coord_flip() +
+  theme_jacob()
+
+# all 3 sentiments at once
+afinn <- dfWordsHeadline %>%
+  inner_join(get_sentiments('afinn')) %>%
+  group_by(value) %>%
+  summarise(Count = n()) %>%
+  mutate(method = 'AFINN')
+
+bing_and_nrc <- bind_rows(dfWordsHeadline %>% 
+                            inner_join(get_sentiments("bing")) %>%
+                            mutate(method = "Bing et al."),
+                          dfWordsHeadline %>% 
+                            inner_join(get_sentiments("nrc") %>% 
+                                         filter(sentiment %in% c("positive", 
+                                                                 "negative"))) %>%
+                            mutate(method = "NRC")) %>%
+  count(method, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+badwords <- dfWordsHeadline %>%
+  inner_join(get_sentiments('afinn')) %>%
+  filter(value == -5) %>%
+  group_by(word) %>%
+  summarise(Count = n())
+
+afinnbad <- dfWordsHeadline %>%
+  inner_join(get_sentiments('afinn')) %>%
+  filter(value < 0)
+
+afinngood <- dfWordsHeadline %>%
+  inner_join(get_sentiments('afinn')) %>%
+  filter(value > 0)
+
+goodwords <- dfWordsHeadline %>%
+  inner_join(get_sentiments('afinn')) %>%
+  filter(value == 5) %>%
+  group_by(word) %>%
+  summarise(Count = n())
+
+
+# top 25words graph - Picture 1
+afinnbad %>%
+  count(word, sort = TRUE) %>%
+  top_n(25) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(x = word, y = n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip() +
+  labs(y = "Count",
+       x = "Unique Words",
+       title = "Top 25 Most Popular Words in Review Headlines",
+       subtitle = 'AFINN Sentiment Analysis - Negative Words',
+       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = "")) +
+  theme_jacob()
+ggsave('amazonnegativewords.png', width = 9, height = 4)
+
+# top 25words graph - Picture 1
+afinngood %>%
+  count(word, sort = TRUE) %>%
+  top_n(25) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(x = word, y = n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip() +
+  labs(y = "Count",
+       x = "Unique Words",
+       title = "Top 25 Most Popular Words in Review Headlines",
+       subtitle = 'AFINN Sentiment Analysis - Positive Words',
+       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = "")) +
+  theme_jacob()
+ggsave('amazonpositivewords.png', width = 9, height = 4)
+
