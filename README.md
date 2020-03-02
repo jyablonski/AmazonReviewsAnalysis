@@ -23,6 +23,8 @@ Here is a simple wordcloud of the most popular words.  The more common the word,
 
 I also wanted to work with forecasting a bit to see if I could predict future values of the number of reviews.  While it's obviously not as valuable as simply predicting sales, it allowed me to work with forecasting concepts to build a few realistic models.  Below are both an ARIMA & Exponential Smoothing Models, with 80% and 95% confidence intervals.  The residuals checked out fine, and i ran a Ljung-Box Test to ensure there was no more autocorrelation in the time series.  
 
+The original dataset stopped in August 2015, so I forecasted the next year (12 periods) of Amazon Reviews.
+
 ![amazonautoarima](https://user-images.githubusercontent.com/16946556/75707752-59285a80-5c74-11ea-8ee0-585e1cbd118c.png)
 
 ![amazonexponentialsmoothing](https://user-images.githubusercontent.com/16946556/75707753-59285a80-5c74-11ea-8d17-ed225f31399d.png)
