@@ -1,7 +1,7 @@
 # AmazonReviewsAnalysis
 This project goes through my process of analyzing Amazon Reviews to find trends & insights.  The dataset is available here https://registry.opendata.aws/amazon-reviews/.  The data includes a subset of Amazon Reviews related to Video Game products from December 2012 to August 2015.  There are a little over 1+ million rows in the dataset with variables like Product Title, the Headline of the Review, the Body of the Review, Date, and the total amount of Help Votes given to the Review.
 
-I specifically analyzed the entire dataset for this project.  I also contemplated filtering specific Product Titles that were popular (Products like a Playstation 3 or games like Grand Theft Auto: V) which is possible if you're interested in a certain product.
+I specifically analyzed the entire dataset for this project using R, including the Tidytext, Tidyverse, and Fpp3 packages.  I also contemplated filtering specific Product Titles that were popular (Products like a Playstation 3 or games like Grand Theft Auto: V) which is possible if you're interested in a certain product.
 
 This is just a rough time series of the data, the red lines represent the spikes which typically occur in December & January around the Holiday Season.  There's also a general upward trend as time increases from Amazon becoming more and more popular.  These spikes & general upward trend are pretty normal & exactly what we would expect to see.
 
@@ -27,8 +27,9 @@ I also wanted to work with forecasting a bit to see if I could predict future va
 
 The original dataset stopped in August 2015, so I forecasted the next year (12 periods) of Amazon Reviews.
 
+The AUTO ARIMA forecast provided (1, 0 ,0) (0, 1, 0) model, indicating there is an AR component and a seasonal component included in the model.
 ![amazonautoarima](https://user-images.githubusercontent.com/16946556/75707752-59285a80-5c74-11ea-8ee0-585e1cbd118c.png)
 
 ![amazonexponentialsmoothing](https://user-images.githubusercontent.com/16946556/75707753-59285a80-5c74-11ea-8d17-ed225f31399d.png)
 
-There was an obvious trend in the data as well as seasonality around the Holiday Season, and both models included these aspects
+There was an obvious trend in the data as well as seasonality around the Holiday Season, so both of these aspects were included in the two final models.  
