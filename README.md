@@ -1,11 +1,13 @@
 # AmazonReviewsAnalysis
 This project goes through my process of analyzing Amazon Reviews to find trends & insights.  The dataset is available here https://registry.opendata.aws/amazon-reviews/.  The data includes a subset of Amazon Reviews related to Video Game products from December 2012 to August 2015.  There are a little over 1+ million rows in the dataset with variables like Product Title, the Headline of the Review, the Body of the Review, Date, and the total amount of Help Votes given to the Review.
 
-I specifically analyzed the entire dataset for this project using R, including the Tidytext, Tidyverse, and Fpp3 packages.  I also contemplated filtering specific Product Titles that were popular (Products like a Playstation 3 or games like Grand Theft Auto: V) which is possible if you're interested in a certain product.
+I specifically analyzed the entire dataset for this project using R, including the Tidytext, Tidyverse, and Fpp3 packages.  Tidytext allows me to perform the Sentiment Analysis portion of the project, and Fpp3 consists of the forecasting packages.
 
-This is just a rough time series of the data, the red lines represent the spikes which typically occur in December & January around the Holiday Season.  There's also a general upward trend as time increases from Amazon becoming more and more popular.  These spikes & general upward trend are pretty normal & exactly what we would expect to see.
+This is just a simple time series of the data, the red lines represent the spikes which typically occur in December & January around the Holiday Season.  There's also a general upward trend as time increases from Amazon becoming more and more popular.  These spikes & general upward trend are pretty normal & exactly what we would expect to see.
 
 ![amazonreviews](https://user-images.githubusercontent.com/16946556/75714753-246ed000-5c81-11ea-8c7a-ef3c175e144e.png)
+
+Using basic dplyr I found a quick top 10 count for the top products & the most frequent reviewers.  I also contemplated filtering specific Product Titles that were popular (Products like a Playstation 3 or games like Grand Theft Auto: V) which could have interesting results if you're interested in analyzing a certain product.
 
 ![customer count](https://user-images.githubusercontent.com/16946556/76690608-d94ca980-65fe-11ea-8326-4c930987dd3c.png)
 ![amazon top products](https://user-images.githubusercontent.com/16946556/76690609-d9e54000-65fe-11ea-8369-25138ae047ca.png)
