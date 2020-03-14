@@ -7,7 +7,7 @@ This is just a simple time series of the data, the red lines represent the spike
 
 ![amazonreviews](https://user-images.githubusercontent.com/16946556/75714753-246ed000-5c81-11ea-8c7a-ef3c175e144e.png)
 
-Using basic dplyr I found a quick top 10 count for the top products & the most frequent reviewers.  I also contemplated filtering specific Titles that were popular (Products like a Playstation 3 or games like Grand Theft Auto: V) which could have interesting results if you're interested in analyzing a certain product.
+Using basic dplyr I found a quick top 10 count for the top products & the most frequent reviewers.  I also contemplated filtering specific Titles that were popular (Products like Playstation 3 or games like Grand Theft Auto: V) which could have interesting results if you're interested in analyzing a certain product.
 
 ![customer count](https://user-images.githubusercontent.com/16946556/76690608-d94ca980-65fe-11ea-8326-4c930987dd3c.png)
 ![amazon top products](https://user-images.githubusercontent.com/16946556/76690609-d9e54000-65fe-11ea-8369-25138ae047ca.png)
