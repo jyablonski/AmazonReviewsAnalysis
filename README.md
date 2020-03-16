@@ -28,6 +28,11 @@ Here is a simple wordcloud of the most popular positive & negative words.  The m
 
 ![Amazon Wordcloud](https://user-images.githubusercontent.com/16946556/75715404-369d3e00-5c82-11ea-8078-a64f19cd94ee.png)
 
+Word Pairs can be used to help get a better idea of some of the meaningful things users are saying in the reviews.  This is just a subset of 5000 of the reviews because of specific limitations with the bigrams function in Tidytext.  Fast shipping was particularly an interesting find - what proportion of these reviews are rated beacuse of external factors like shipping vs the actual quality of the specific product?  Something to keep in mind.  
+
+![amazonreviews](https://user-images.githubusercontent.com/16946556/76804190-ea312280-6798-11ea-9d1b-be341d3aa0cc.png)
+![amazonwordpairs](https://user-images.githubusercontent.com/16946556/76804197-eac9b900-6798-11ea-8db3-36690d60b86c.png)
+
 
 I also wanted to work with forecasting a bit to see if I could predict future values of the number of reviews.  While it's obviously not as valuable as simply predicting sales, it allowed me to work with forecasting concepts to build a few realistic models.  Below are both ARIMA & Exponential Smoothing Models, with 80% and 95% confidence intervals.  The residuals checked out fine, and I ran a Ljung-Box Test to ensure there was no autocorrelation present in the time series.  
 
