@@ -30,7 +30,7 @@ Here is a simple wordcloud of the most popular positive & negative words.  The m
 
 Word Pairs can be used to help get a better idea of some of the meaningful things users are saying in the reviews.  This is just a subset of 5000 of the reviews because of specific limitations with the bigrams function in Tidytext.  Fast shipping was particularly an interesting find - what proportion of these reviews are rated beacuse of external factors like shipping vs the actual quality of the specific product?  Something to keep in mind.  
 
-![amazonreviews](https://user-images.githubusercontent.com/16946556/76804190-ea312280-6798-11ea-9d1b-be341d3aa0cc.png)
+![amazonwordpairs imgur](https://user-images.githubusercontent.com/16946556/76804416-675c9780-6799-11ea-8c1f-741978cd955d.png)
 ![amazonwordpairs](https://user-images.githubusercontent.com/16946556/76804197-eac9b900-6798-11ea-8db3-36690d60b86c.png)
 
 
