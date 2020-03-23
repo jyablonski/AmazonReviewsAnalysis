@@ -1,3 +1,7 @@
+# loading packages and adjusting keywords ----
+# The Data - https://registry.opendata.aws/amazon-reviews/
+# Data from 12-11-2012 to 8-31-2015
+
 library(tidytext)
 library(tidyverse)
 library(extrafont)
@@ -13,10 +17,6 @@ library(GGally)
 library(fpp3)
 library(sugrrants)
 
-# The Data - https://registry.opendata.aws/amazon-reviews/
-
-# adjust keyword variable & create system date.
-
 dateVariable <- Sys.Date()
 dateVariable <-  format(dateVariable, format = "%B %d, %Y")
 
@@ -28,7 +28,9 @@ theme_jacob <- function () {
       plot.background = element_rect(fill = 'floralwhite', color = 'floralwhite')
     )
 }
-# Data from 12-11-2012 to 8-31-2015
+
+
+# loading data in and formatting it ----
 df <- read_csv('Amazon Video Game Review Data.csv ')
 
 df2 <- df %>%
@@ -43,28 +45,38 @@ df2$Date <- mdy(df2$Date)
 df2 <- as.data.frame(df2)
 str(df2)
   
-  # Top 10 Customers - 1 Customer left 293 Reviews !
-  df2 %>%
-    select(CustID, Review) %>%
-    group_by(CustID) %>%
-    summarise(Count = n()) %>%
-    arrange(desc(Count)) %>%
-    top_n(10)
+# Top 10 Customers
+df2 %>%
+  select(CustID, Review) %>%
+  group_by(CustID) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count)) %>%
+  top_n(10)
   
-  df2 %>%
-    select(Title) %>%
-    group_by(Title) %>%
-    summarise(Count = n()) %>%
-    arrange(desc(Count)) %>%
-    top_n(10)
+df2 %>%
+  select(Title) %>%
+  group_by(Title) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count)) %>%
+  top_n(10)
+
+# building ratings table + graph
+df2ratings <- df2 %>%
+  count(Rating) %>%
+  mutate(Pct = (n / sum(n)) * 100) %>%
+  mutate('Percent of Total' = round(Pct, 2)) %>%
+  select(-Pct)
 
 ggplot(df2, aes(x = Rating)) +
   geom_histogram() +
   scale_y_continuous(labels = comma) +
+  labs(title = 'Amazon Rating Counts') +
   theme_jacob()
+ggsave("amazonratingcounts.png", width = 9, height = 4)
 
 head(df2$Review)
 
+# specific product titles
 df2GTAV <- df2 %>%
   filter(Title == 'Grand Theft Auto V')
 ggplot(df2GTAV, aes(x = Rating)) +
@@ -74,7 +86,9 @@ ggplot(df2GTAV, aes(x = Rating)) +
   theme_jacob()
 
 df2PS3 <- df2 %>%
-  filter(Title == 'PlayStation 4 500GB Console [Old Model]')
+  filter(Title == 'PlayStation 4 500GB Console [Old Model]') %>%
+  group_by(Date) %>%
+  summarise(Count = n())
 
 ggplot(df2PS3, aes(x = Rating)) +
   geom_histogram() +
@@ -82,11 +96,6 @@ ggplot(df2PS3, aes(x = Rating)) +
   labs(title = 'PS3 Ratings') +
   theme_jacob()
 
-df2 %>%
-  count(is.na(Date))
-
-df2 %>%
-  count(is.na(Rating))
 
 # list of every columns na values.
 colSums(is.na(df2))
@@ -110,6 +119,7 @@ df2days <- df2 %>%
   summarise(Count = n()) %>%
   mutate(impDate = ifelse(Count %in% tail(sort(Count), 10), 'Important Date', " "))
 
+# time series graph ----
 ggplot(df2days, aes(Date, Count, fill = impDate)) +
   geom_bar(stat = 'identity', width = 1.2) +
   scale_y_continuous(labels = comma) +
@@ -123,7 +133,7 @@ ggplot(df2days, aes(Date, Count, fill = impDate)) +
        subtitle = "Data Ranging from Dec. 2012 - Aug. 2015",
        x = "Date", 
        y = "Total Reviews", 
-       caption = "data via Amazon AWS Public Dataset | Created by Jacob Yablonski") + 
+       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = "")) +
   theme_jacob() +
   theme(plot.title = element_text(face = 'bold', hjust = .5), 
         plot.subtitle = element_text(hjust = .5), 
@@ -134,7 +144,7 @@ str(df2days)
 
 
 
-# Forecasting next 12 months of Number of Reviews
+# Forecasting next 12 months of Number of Reviews ----
 dfForecast <- as_tsibble(df2)
 dfForecast <- df2Months %>%
   as_tsibble(index = Month)
@@ -147,7 +157,7 @@ pfit <- dfForecast %>%
 report(pfit)
 abc <- augment(pfit) # fitted values & forecast horizon stuff
 gg_tsresiduals(pfit) # checking residuals.  
-
+accuracy(fc, dfForecast)
 fc <- pfit %>%
   forecast(h = 12)
 
@@ -192,7 +202,7 @@ df2lowRatings <- df2 %>%
 df2highRatings <- df2 %>%
   filter(Rating == 5)
 
-# Tidy text stuff on Review Body
+# Tidy text stuff on Review Body ----
 dfWords <- df2 %>%
   dplyr::select(Review) %>%
   unnest_tokens(word, Review)
@@ -236,7 +246,46 @@ dfWords %>%
   theme_jacob()
 ggsave('amazontop25wordsReviews.png', width = 9, height = 4)
 
-# filter out any noticeable sentiment word that is out of place here ----
+
+# bigram stuff
+dfbigramz <- df2 %>%
+  head(5000)
+# looking at paired words in tweets - bigrams
+bigram <- dfbigramz %>%
+  dplyr::select(Review) %>%
+  unnest_tokens(bigram, Review, token = "ngrams", n = 2)
+
+bigrams_separated <- bigram  %>%
+  separate(bigram, c("word1", "word2"), sep = " ")
+
+bigrams_filtered <- bigrams_separated %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word)
+
+bigram_counts <- bigrams_filtered %>%
+  count(word1, word2, sort = TRUE) %>%
+  filter(word1 != 'br') %>%
+  filter(word2 != 'br')
+
+head(bigram_counts, 15)
+
+bigrams_united <- bigrams_filtered %>%
+  unite(bigram, word1, word2, sep = " ")
+
+# Word Network Graph - Picture 2
+bigram_counts %>%
+  filter(n >= 20) %>%
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_node_point(color = "darkslategray4", size = 3) +
+  geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
+  labs(title = "Most Popular Word Pairs",
+       subtitle = "Text Mining with Amazon Review Data",
+       x = "", y = "") +
+  theme_jacob()
+ggsave('amazonwordpairs.png', width = 9, height = 4)
+
+# filter out any noticeable sentiment word that is out of place here
 bing_word_counts <- dfWords %>%
   inner_join(get_sentiments("bing")) %>%
   count(word, sentiment, sort = TRUE) %>%
@@ -328,7 +377,7 @@ dfWordsHeadline %>%
   theme_jacob()
 
 
-# filter out any noticeable sentiment word that is out of place here ----
+# filter out any noticeable sentiment word that is out of place here
 bing_word_counts_headline <- dfWordsHeadline %>%
   inner_join(get_sentiments("bing")) %>%
   count(word, sentiment, sort = TRUE) %>%
