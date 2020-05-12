@@ -48,7 +48,7 @@ Word Pairs can be used to help get a better idea of some of the meaningful thing
 ![amazonwordpairs](https://user-images.githubusercontent.com/16946556/76804197-eac9b900-6798-11ea-8db3-36690d60b86c.png)
 
 ## LASSO Regression
-I utilized LASSO Regression to help give me a more formal and technical understanding of which words were most meaningful in classifying a good or bad review.  For this analysis I considered a 'Positive' review to be a rating of 4 or 5, while 'Negative' reviews consist of ratings that are 1, 2, or 3.  This dataset was limited to 100,000 reviews because of limitations with the text mining & machine learning algorithms.
+I utilized LASSO Regression to help give me a more formal and technical understanding of which words were most meaningful in classifying a positive or negative review.  For this analysis I considered a 'Positive' review to be a rating of 4 or 5, while 'Negative' reviews consisted of ratings that are 1, 2, or 3.  This dataset was limited to 100,000 of the dataset's 1+ million reviews because of limitations with the text mining & machine learning algorithms.
 
 Below are a list of the steps taken using the Tidymodels package to conduct the Machine Learning.  This performs the text mining of the machine learning model, removes stop words, selects 500 of the most important words when taking into account their term frequency (tf-idf), and normalizes the data to have a standard deviation of 1 and a mean of 0.  The data was split into 75% Training Data, 25% Testing Data.
 
