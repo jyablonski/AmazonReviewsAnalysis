@@ -21,6 +21,10 @@ Here is the distribution of the Rating Counts in the dataset, along with the act
 ![amazonratingcounts](https://user-images.githubusercontent.com/16946556/77356708-16522380-6d04-11ea-8a51-9bc24239c76b.png)
 ![rating counts imgur](https://user-images.githubusercontent.com/16946556/77356710-16eaba00-6d04-11ea-98d0-b7f984f1c8b3.png)
 
+Below is a distribution of the total number of words in each review.  Users typically tend to keep it short, with the majority of reviews containing less than 50 words.  
+
+![AmazonHistogramWords](https://user-images.githubusercontent.com/16946556/81755474-b9eec300-946d-11ea-9395-2fc25db1909e.png)
+
 
 ## Sentiment Analysis
 I then performed Sentiment Analysis and analyzed the top 25 words in the bodies of the Reviews and the top 15 most popular words by positive and negative connotation via the Bing Sentiment.  
@@ -44,12 +48,14 @@ Word Pairs can be used to help get a better idea of some of the meaningful thing
 ![amazonwordpairs](https://user-images.githubusercontent.com/16946556/76804197-eac9b900-6798-11ea-8db3-36690d60b86c.png)
 
 ## LASSO Regression
+I utilized LASSO Regression to help give me a more formal and technical understanding of which words were most meaningful in classifying a good or bad review.  For this analysis I considered a 'Good' review to be a rating of 4 or 5, while 'Bad' reviews consist of ratings that are 1, 2, or 3.
 
+Below is a list of the steps taken using the Tidymodels package to conduct the Machine Learning.  
 ![AmazonLASSO](https://user-images.githubusercontent.com/16946556/81755471-b9562c80-946d-11ea-9842-ffe136ab037e.png)
+
+The LASSO model had an accuracy of 79.01%, so a significant amount of the data was being explained but there was still a sizeable amount of error.  The confusion matrix shows that most of the wrong predictions came from the model classifying a review as a 'Good' review when in reality it was bad.  This is probably due to the nature of my arbitrary assignment of Good and Bad reviews.
+
 ![AmazonLASSOcm](https://user-images.githubusercontent.com/16946556/81755473-b9eec300-946d-11ea-940e-cd5696773840.png)
-![AmazonHistogramWords](https://user-images.githubusercontent.com/16946556/81755474-b9eec300-946d-11ea-9395-2fc25db1909e.png)
-
-
 
 ## Forecasting the Number of Reviews
 I also wanted to work with forecasting a bit to see if I could predict future values of the number of reviews.  While it's obviously not as valuable as simply predicting sales, it allowed me to work with forecasting concepts to build a few realistic models.  Below are both ARIMA & Exponential Smoothing Models, with 80% and 95% confidence intervals.  The residuals checked out fine, and I ran a Ljung-Box Test to ensure there was no autocorrelation present in the time series.  
