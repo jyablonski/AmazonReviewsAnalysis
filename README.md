@@ -54,10 +54,11 @@ Below are a list of the steps taken using the Tidymodels package to conduct the 
 
 ![amazon workflow](https://user-images.githubusercontent.com/16946556/81755962-3504a900-946f-11ea-8835-c5d07ca19eb5.png)
 
-Here are the results of the most meaningful predictor words of Positive and Negative reviews.
+Here are the results of the most meaningful predictor words of Positive and Negative reviews.  It was much easier to distinguish positive reviews which is why there is noticeably more importance on those words than those of the negative words.  As this dataset is related to Video Game Products, it makes sense that the presence of words like broken, return, and stopped generally led to more negative reviews. 
+
 ![AmazonLASSO](https://user-images.githubusercontent.com/16946556/81755471-b9562c80-946d-11ea-9842-ffe136ab037e.png)
 
-The LASSO model had an accuracy of 79.01%, so a significant amount of the data was being explained but there was still a sizeable amount of error.  The confusion matrix below shows that most of the wrong predictions came from the model classifying a review as a 'Good' review when in reality it was bad.  This is probably due to the nature of my arbitrary assignment of Positive and Negative reviews mentioned earlier.
+The LASSO model had an accuracy of 79.01%, so a significant amount of the data was being explained but there was still a sizeable amount of error.  The confusion matrix below shows that most of the wrong predictions came from the model classifying a review as a 'Good' review when in reality it was bad.  This is probably due to the nature of my arbitrary assignment of Positive and Negative reviews mentioned earlier.  It's also worth noting over 78% of the dataset had positive ratings of 4 or 5, which leaves only 22% having negative ratings of 1, 2, or 3.
 
 ![AmazonLASSOcm](https://user-images.githubusercontent.com/16946556/81755473-b9eec300-946d-11ea-940e-cd5696773840.png)
 
