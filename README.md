@@ -48,12 +48,16 @@ Word Pairs can be used to help get a better idea of some of the meaningful thing
 ![amazonwordpairs](https://user-images.githubusercontent.com/16946556/76804197-eac9b900-6798-11ea-8db3-36690d60b86c.png)
 
 ## LASSO Regression
-I utilized LASSO Regression to help give me a more formal and technical understanding of which words were most meaningful in classifying a good or bad review.  For this analysis I considered a 'Good' review to be a rating of 4 or 5, while 'Bad' reviews consist of ratings that are 1, 2, or 3.
+I utilized LASSO Regression to help give me a more formal and technical understanding of which words were most meaningful in classifying a good or bad review.  For this analysis I considered a 'Positive' review to be a rating of 4 or 5, while 'Negative' reviews consist of ratings that are 1, 2, or 3.  This dataset was limited to 100,000 reviews because of limitations with the text mining & machine learning algorithms.
 
-Below is a list of the steps taken using the Tidymodels package to conduct the Machine Learning.  
+Below are a list of the steps taken using the Tidymodels package to conduct the Machine Learning.  This performs the text mining of the machine learning model, removes stop words, selects 500 of the most important words when taking into account their term frequency (tf-idf), and normalizes the data to have a standard deviation of 1 and a mean of 0.  The data was split into 75% Training Data, 25% Testing Data.
+
+![amazon workflow](https://user-images.githubusercontent.com/16946556/81755962-3504a900-946f-11ea-8835-c5d07ca19eb5.png)
+
+Here are the results of the most meaningful predictor words of Positive and Negative reviews.
 ![AmazonLASSO](https://user-images.githubusercontent.com/16946556/81755471-b9562c80-946d-11ea-9842-ffe136ab037e.png)
 
-The LASSO model had an accuracy of 79.01%, so a significant amount of the data was being explained but there was still a sizeable amount of error.  The confusion matrix shows that most of the wrong predictions came from the model classifying a review as a 'Good' review when in reality it was bad.  This is probably due to the nature of my arbitrary assignment of Good and Bad reviews.
+The LASSO model had an accuracy of 79.01%, so a significant amount of the data was being explained but there was still a sizeable amount of error.  The confusion matrix below shows that most of the wrong predictions came from the model classifying a review as a 'Good' review when in reality it was bad.  This is probably due to the nature of my arbitrary assignment of Positive and Negative reviews mentioned earlier.
 
 ![AmazonLASSOcm](https://user-images.githubusercontent.com/16946556/81755473-b9eec300-946d-11ea-940e-cd5696773840.png)
 
