@@ -43,6 +43,13 @@ Word Pairs can be used to help get a better idea of some of the meaningful thing
 ![amazonwordpairs imgur](https://user-images.githubusercontent.com/16946556/76804416-675c9780-6799-11ea-8c1f-741978cd955d.png)
 ![amazonwordpairs](https://user-images.githubusercontent.com/16946556/76804197-eac9b900-6798-11ea-8db3-36690d60b86c.png)
 
+## LASSO Regression
+
+![AmazonLASSO](https://user-images.githubusercontent.com/16946556/81755471-b9562c80-946d-11ea-9842-ffe136ab037e.png)
+![AmazonLASSOcm](https://user-images.githubusercontent.com/16946556/81755473-b9eec300-946d-11ea-940e-cd5696773840.png)
+![AmazonHistogramWords](https://user-images.githubusercontent.com/16946556/81755474-b9eec300-946d-11ea-9395-2fc25db1909e.png)
+
+
 
 ## Forecasting the Number of Reviews
 I also wanted to work with forecasting a bit to see if I could predict future values of the number of reviews.  While it's obviously not as valuable as simply predicting sales, it allowed me to work with forecasting concepts to build a few realistic models.  Below are both ARIMA & Exponential Smoothing Models, with 80% and 95% confidence intervals.  The residuals checked out fine, and I ran a Ljung-Box Test to ensure there was no autocorrelation present in the time series.  
