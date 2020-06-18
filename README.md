@@ -42,10 +42,8 @@ Here is a simple wordcloud of the most popular positive & negative words.  The m
 
 ![Amazon Wordcloud](https://user-images.githubusercontent.com/16946556/75715404-369d3e00-5c82-11ea-8078-a64f19cd94ee.png)
 
-Word Pairs can be used to help get a better idea of some of the meaningful things users are saying in the reviews.  This is just a subset of 5000 of the reviews because of specific limitations with the bigrams function in Tidytext.  Fast shipping was particularly an interesting find - what proportion of these reviews are rated beacuse of external factors like shipping vs the actual quality of the specific product?  Something to keep in mind.  
+![amazonggraphnew](https://user-images.githubusercontent.com/16946556/84967500-f21a9e80-b0c8-11ea-86af-f5f26575fed3.png)
 
-![amazonwordpairs imgur](https://user-images.githubusercontent.com/16946556/76804416-675c9780-6799-11ea-8c1f-741978cd955d.png)
-![amazonwordpairs](https://user-images.githubusercontent.com/16946556/76804197-eac9b900-6798-11ea-8db3-36690d60b86c.png)
 
 ## LASSO Regression
 I utilized LASSO Regression to help give me a more formal and technical understanding of which words were most meaningful in classifying a positive or negative review.  For this analysis I considered a 'Positive' review to be a rating of 4 or 5, while 'Negative' reviews consisted of ratings that are 1, 2, or 3.  This dataset was limited to 100,000 of the dataset's 1+ million reviews because of limitations with the text mining & machine learning algorithms.
