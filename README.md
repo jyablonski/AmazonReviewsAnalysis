@@ -28,9 +28,7 @@ Below is a distribution of the total number of words in each review.  Users typi
 
 
 ## Sentiment Analysis
-I then performed Sentiment Analysis and analyzed the top 25 words in the bodies of the Reviews and the top 15 most popular words by positive and negative connotation via the Bing Sentiment.  
-
-![amazontop25wordsReviews](https://user-images.githubusercontent.com/16946556/75707751-57f72d80-5c74-11ea-8588-4a98a78d4624.png)
+I then performed Sentiment Analysis and analyzed the top 15 most popular words by positive and negative connotation via the Bing Sentiment, which is a Lexicon that ranks words based on Positive or Negative connotation. 
 
 ![amazontop15Bing](https://user-images.githubusercontent.com/16946556/113646462-ba6fe980-963d-11eb-8136-bae26ac663eb.png)
 
@@ -42,8 +40,9 @@ Here is a simple wordcloud of the most popular positive & negative words.  The m
 This is a full bigram plot using the ggraph package utilizing the entire dataset.  I recommend clicking on it and zooming it, but these are the most commonly associated word pairs in the body text of these Amazon Reviews, colored by their average rating.  
 ![amazonggraphnew](https://user-images.githubusercontent.com/16946556/113646467-bb088000-963d-11eb-98e0-6cfcdb8d64c5.png)
 
-![amazon_bigrams2](https://user-images.githubusercontent.com/16946556/113647128-171fd400-963f-11eb-85e6-3a0f241423e7.png)
+This is a similar plot, but only looks at word pairs and not further associations.  The arrows help point to what direction the word pairs starts & ends.  
 
+![amazon_bigrams2](https://user-images.githubusercontent.com/16946556/113647128-171fd400-963f-11eb-85e6-3a0f241423e7.png)
 
 
 ## Forecasting the Number of Reviews
@@ -70,7 +69,7 @@ Below is an ROC Curve comparing the results of the 4 models.  Logistic Regressio
 
 ![amazon_roc](https://user-images.githubusercontent.com/16946556/113648831-1fc5d980-9642-11eb-9ad5-8be3d6b4a8d9.png)
 
-Moving forward I chose to use the Logistic Regression Model.  Below is a Confusion Matrix of the results when using that model on the testing set, along with some of theperformance metrics.
+Moving forward I chose to use the Logistic Regression Model.  Below is a Confusion Matrix of the results when using that model on the testing set, along with some of the performance metrics.
 
 ![amazon_heatmap](https://user-images.githubusercontent.com/16946556/113646466-bb088000-963d-11eb-9727-b7a0a6dcae86.png)
 
@@ -80,6 +79,7 @@ Here are the results of the most meaningful predictor words of Positive and Nega
 ![amazon_importance](https://user-images.githubusercontent.com/16946556/113646465-bb088000-963d-11eb-8fb1-2f4f73885dc5.png)
 
 
+## Product Recommendations
 
 
 
