@@ -35,11 +35,6 @@ I then performed Sentiment Analysis and analyzed the top 25 words in the bodies 
 
 ![amazontop15Bing](https://user-images.githubusercontent.com/16946556/113646462-ba6fe980-963d-11eb-8136-bae26ac663eb.png)
 
-The AFINN Sentiment is another way of splitting words up by applying a value of -5 (most negative) to 5 (most positive) to each word that is analyzed.  Here i'm just separating them into 2 distinct categories and trying to spot any obvious differences because positive reviews can be quite different than negative ones.  Words that got assigned values of -5 and 5 were extremely rare and difficult to conduct any meaningful analysis on because of the small sample size
-
-![amazonnegativewords](https://user-images.githubusercontent.com/16946556/75707755-59c0f100-5c74-11ea-8c84-96dfbd4d6ec7.png)
-![amazonpositivewords](https://user-images.githubusercontent.com/16946556/75707756-59c0f100-5c74-11ea-92f9-3704e20ce6ba.png)
-
 Here is a simple wordcloud of the most popular positive & negative words.  The more common the word, the larger it is. 
 
 ![Amazon Wordcloud](https://user-images.githubusercontent.com/16946556/75715404-369d3e00-5c82-11ea-8078-a64f19cd94ee.png)
@@ -60,9 +55,7 @@ Here are the results of the most meaningful predictor words of Positive and Nega
 
 ![AmazonLASSO](https://user-images.githubusercontent.com/16946556/81755471-b9562c80-946d-11ea-9842-ffe136ab037e.png)
 
-The LASSO model had an accuracy of 79.01%, so a significant amount of the data was being explained but there was still a sizeable amount of error.  The confusion matrix below shows that most of the wrong predictions came from the model classifying a review as a 'Good' review when in reality it was bad.  This is probably due to the nature of my arbitrary assignment of Positive and Negative reviews mentioned earlier.  It's also worth noting over 78% of the dataset had positive ratings of 4 or 5, which leaves only 22% having negative ratings of 1, 2, or 3.
-
-![AmazonLASSOcm](https://user-images.githubusercontent.com/16946556/81755473-b9eec300-946d-11ea-940e-cd5696773840.png)
+![amazon_heatmap](https://user-images.githubusercontent.com/16946556/113646466-bb088000-963d-11eb-9727-b7a0a6dcae86.png)
 
 ## Forecasting the Number of Reviews
 I also wanted to work with forecasting a bit to see if I could predict future values of the number of reviews.  While it's obviously not as valuable as simply predicting sales, it allowed me to work with forecasting concepts to build a few realistic models.  Below are both ARIMA & Exponential Smoothing Models, with 80% and 95% confidence intervals.  The residuals checked out fine, and I ran a Ljung-Box Test to ensure there was no autocorrelation present in the time series.  
