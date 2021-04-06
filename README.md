@@ -82,7 +82,3 @@ Here are the results of the most meaningful predictor words of Positive and Nega
 ![amazon_importance](https://user-images.githubusercontent.com/16946556/113646465-bb088000-963d-11eb-8fb1-2f4f73885dc5.png)
 
 
-## Product Recommendations
-
-
-
