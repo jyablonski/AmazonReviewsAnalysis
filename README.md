@@ -46,17 +46,6 @@ This is a full bigram plot using the ggraph package utilizing the entire dataset
 
 
 
-## Model Building
-Below are a list of the steps taken using the Tidymodels package to conduct the Machine Learning.  This performs the text mining of the machine learning model, removes stop words, selects 500 of the most important words when taking into account their term frequency (tf-idf), and normalizes the data to have a standard deviation of 1 and a mean of 0.  The data was split into 75% Training Data, 25% Testing Data.
-
-![amazon workflow](https://user-images.githubusercontent.com/16946556/81755962-3504a900-946f-11ea-8835-c5d07ca19eb5.png)
-
-Here are the results of the most meaningful predictor words of Positive and Negative reviews.  It was much easier to distinguish positive reviews which is why there is noticeably more importance on those words than those of the negative words.  As this dataset is related to Video Game Products, it makes sense that the presence of words like broken, return, and stopped generally led to more negative reviews. 
-
-![amazon_importance](https://user-images.githubusercontent.com/16946556/113646465-bb088000-963d-11eb-8fb1-2f4f73885dc5.png)
-
-![amazon_heatmap](https://user-images.githubusercontent.com/16946556/113646466-bb088000-963d-11eb-9727-b7a0a6dcae86.png)
-
 ## Forecasting the Number of Reviews
 I also wanted to work with forecasting a bit to see if I could predict future values of the number of reviews.  While it's obviously not as valuable as simply predicting sales, it allowed me to work with forecasting concepts to build a few realistic models.  Below are both ARIMA & Exponential Smoothing Models, with 80% and 95% confidence intervals.  The residuals checked out fine, and I ran a Ljung-Box Test to ensure there was no autocorrelation present in the time series.  
 
@@ -68,6 +57,20 @@ The AUTO ARIMA forecast provided (1, 0 ,0) (0, 1, 0) model, indicating there is 
 ![amazonexponentialsmoothing](https://user-images.githubusercontent.com/16946556/113646459-b9d75300-963d-11eb-99ca-25f9e2a88a20.png)
 
 There was an obvious trend in the data as well as seasonality around the Holiday Season, so both of these aspects were included in the two final models. 
+
+
+## Model Building
+Below are a list of the steps taken using the Tidymodels package to conduct the Machine Learning.  This performs the text mining of the machine learning model, removes stop words, selects 500 of the most important words when taking into account their term frequency (tf-idf), and normalizes the data to have a standard deviation of 1 and a mean of 0.  The data was split into 75% Training Data, 25% Testing Data.
+
+![amazon workflow](https://user-images.githubusercontent.com/16946556/81755962-3504a900-946f-11ea-8835-c5d07ca19eb5.png)
+
+Here are the results of the most meaningful predictor words of Positive and Negative reviews.  It was much easier to distinguish positive reviews which is why there is noticeably more importance on those words than those of the negative words.  As this dataset is related to Video Game Products, it makes sense that the presence of words like broken, return, and stopped generally led to more negative reviews. 
+
+![amazon_roc](https://user-images.githubusercontent.com/16946556/113648831-1fc5d980-9642-11eb-9ad5-8be3d6b4a8d9.png)
+
+![amazon_importance](https://user-images.githubusercontent.com/16946556/113646465-bb088000-963d-11eb-8fb1-2f4f73885dc5.png)
+
+![amazon_heatmap](https://user-images.githubusercontent.com/16946556/113646466-bb088000-963d-11eb-9727-b7a0a6dcae86.png)
 
 
 
