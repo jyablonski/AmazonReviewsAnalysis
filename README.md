@@ -21,7 +21,6 @@ Using basic dplyr I found a quick top 10 count for the top products & the most f
 Here is the distribution of the Rating Counts in the dataset, along with the actual numbers & percentages listed below.  Over 78% of the ratings were 4 or 5 stars, and the two least popular choices were 2 & 3 star ratings.  This seems pretty ordinary for rating data, customers tend to gravitate to the extreme ends of voicing their pleasure or displeasure when it comes to recommending a product to other people.
 
 ![amazonratingcounts](https://user-images.githubusercontent.com/16946556/113646470-bba11680-963d-11eb-8ab3-379da23f10d7.png)
-![rating counts imgur](https://user-images.githubusercontent.com/16946556/77356710-16eaba00-6d04-11ea-98d0-b7f984f1c8b3.png)
 
 Below is a distribution of the total number of words in each review.  Users typically tend to keep it short, with the majority of reviews containing less than 50 words.  
 
