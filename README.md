@@ -60,17 +60,25 @@ There was an obvious trend in the data as well as seasonality around the Holiday
 
 
 ## Model Building
-Below are a list of the steps taken using the Tidymodels package to conduct the Machine Learning.  This performs the text mining of the machine learning model, removes stop words, selects 500 of the most important words when taking into account their term frequency (tf-idf), and normalizes the data to have a standard deviation of 1 and a mean of 0.  The data was split into 75% Training Data, 25% Testing Data.
+I also wanted to conduct Machine Learning to try and predict Ratings based on what the users were saying.  I chose to build Logistic Regression, Random Forest, XGBoost, and KNN Models.  The Outcome variable is general_rating, which is a categorical variable that is 'Good' if the Rating of the Review is 4 or 5, and 'Bad' if the Rating is 1 or 2.  I chose to remove Ratings of 3 because it helped increase the performance of my model and in general I found those ratings to be extremely inconsistent and not very valuable.
+
+Below are a list of the steps taken using the Tidymodels package to conduct Machine Learning and try to predict good or bad reviews.  These steps extract the text from the reviews, removes stop words, selects 500 of the most important words when taking into account their tf-idf scores, and normalizes the data to have a standard deviation of 1 and a mean of 0.  The data was split into 75% Training Data, 25% Testing Data.  I also performed K-fold Cross Validation with 5 folds, and stratified both the folds and the training data by general_rating to make sure the proportions of the outcome variable were the same.
 
 ![amazon workflow](https://user-images.githubusercontent.com/16946556/81755962-3504a900-946f-11ea-8835-c5d07ca19eb5.png)
 
-Here are the results of the most meaningful predictor words of Positive and Negative reviews.  It was much easier to distinguish positive reviews which is why there is noticeably more importance on those words than those of the negative words.  As this dataset is related to Video Game Products, it makes sense that the presence of words like broken, return, and stopped generally led to more negative reviews. 
+Below is an ROC Curve comparing the results of the 4 models.  Logistic Regression and Random Forest models stand out and are virtually the same in terms of predictive power.  XGBoost and KNN were lagging behind in their performance.
 
 ![amazon_roc](https://user-images.githubusercontent.com/16946556/113648831-1fc5d980-9642-11eb-9ad5-8be3d6b4a8d9.png)
 
-![amazon_importance](https://user-images.githubusercontent.com/16946556/113646465-bb088000-963d-11eb-8fb1-2f4f73885dc5.png)
+Moving forward I chose to use the Logistic Regression Model.  Below is a Confusion Matrix of the results when using that model on the testing set, along with some of theperformance metrics.
 
 ![amazon_heatmap](https://user-images.githubusercontent.com/16946556/113646466-bb088000-963d-11eb-9727-b7a0a6dcae86.png)
+
+Here are the results of the most meaningful predictor words of Positive and Negative reviews.  As this dataset is related to Video Game Products, it makes sense that the presence of words like broken, return, and stopped generally led to more negative reviews. And on the flip side, positive keywords like love, works, perfect, and enjoyed led to higher overall Ratings.
+
+
+![amazon_importance](https://user-images.githubusercontent.com/16946556/113646465-bb088000-963d-11eb-8fb1-2f4f73885dc5.png)
+
 
 
 
