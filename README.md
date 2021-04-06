@@ -44,9 +44,7 @@ This is a full bigram plot using the ggraph package utilizing the entire dataset
 ![amazonggraphnew](https://user-images.githubusercontent.com/16946556/113646467-bb088000-963d-11eb-98e0-6cfcdb8d64c5.png)
 
 
-## LASSO Regression
-I utilized LASSO Regression to help give me a more formal and technical understanding of which words were most meaningful in classifying a positive or negative review.  For this analysis I considered a 'Positive' review to be a rating of 4 or 5, while 'Negative' reviews consisted of ratings that are 1, 2, or 3.  This dataset was limited to 100,000 of the dataset's 1+ million reviews because of limitations with the text mining & machine learning algorithms.
-
+## Model Building
 Below are a list of the steps taken using the Tidymodels package to conduct the Machine Learning.  This performs the text mining of the machine learning model, removes stop words, selects 500 of the most important words when taking into account their term frequency (tf-idf), and normalizes the data to have a standard deviation of 1 and a mean of 0.  The data was split into 75% Training Data, 25% Testing Data.
 
 ![amazon workflow](https://user-images.githubusercontent.com/16946556/81755962-3504a900-946f-11ea-8835-c5d07ca19eb5.png)
