@@ -43,7 +43,7 @@ Here is a simple wordcloud of the most popular positive & negative words.  The m
 This is a full bigram plot using the ggraph package utilizing the entire dataset.  I recommend clicking on it and zooming it, but these are the most commonly associated word pairs in the body text of these Amazon Reviews, colored by their average rating.  
 ![amazonggraphnew](https://user-images.githubusercontent.com/16946556/113646467-bb088000-963d-11eb-98e0-6cfcdb8d64c5.png)
 
-![amazon_bigrams2](https://user-images.githubusercontent.com/16946556/113646998-d0ca7500-963e-11eb-9cbe-e567e88d2eb8.png)
+![amazon_bigrams2](https://user-images.githubusercontent.com/16946556/113647128-171fd400-963f-11eb-85e6-3a0f241423e7.png)
 
 
 
