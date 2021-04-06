@@ -68,12 +68,6 @@ The AUTO ARIMA forecast provided (1, 0 ,0) (0, 1, 0) model, indicating there is 
 There was an obvious trend in the data as well as seasonality around the Holiday Season, so both of these aspects were included in the two final models. 
 
 
-
-![amazonpositivewords](https://user-images.githubusercontent.com/16946556/113646463-ba6fe980-963d-11eb-8092-1e7ea0ece498.png)
-![amazonnegativewords](https://user-images.githubusercontent.com/16946556/113646464-ba6fe980-963d-11eb-865b-41ab9a2ceba2.png)
-![amazon_importance](https://user-images.githubusercontent.com/16946556/113646465-bb088000-963d-11eb-8fb1-2f4f73885dc5.png)
-![amazon_heatmap](https://user-images.githubusercontent.com/16946556/113646466-bb088000-963d-11eb-9727-b7a0a6dcae86.png)
-
 ![amazonwordpairs](https://user-images.githubusercontent.com/16946556/113646469-bba11680-963d-11eb-8eb1-8c912d23a65e.png)
 
 
