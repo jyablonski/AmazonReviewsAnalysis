@@ -73,6 +73,9 @@ Moving forward I chose to use the Logistic Regression Model.  Below is a Confusi
 
 ![amazon_heatmap](https://user-images.githubusercontent.com/16946556/113646466-bb088000-963d-11eb-9727-b7a0a6dcae86.png)
 
+![amazon_metrics](https://user-images.githubusercontent.com/16946556/113768936-44b75c80-96d5-11eb-92d2-e5ac47dd0767.png)
+
+
 Here are the results of the most meaningful predictor words of Positive and Negative reviews.  As this dataset is related to Video Game Products, it makes sense that the presence of words like broken, return, and stopped generally led to more negative reviews. And on the flip side, positive keywords like love, works, perfect, and enjoyed led to higher overall Ratings.
 
 
