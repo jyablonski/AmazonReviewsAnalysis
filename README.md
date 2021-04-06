@@ -81,4 +81,5 @@ Here are the results of the most meaningful predictor words of Positive and Nega
 
 ![amazon_importance](https://user-images.githubusercontent.com/16946556/113646465-bb088000-963d-11eb-8fb1-2f4f73885dc5.png)
 
+There's also a possibility of running this same machine learning modeling process on each individual product, given there's a big enough sample size.  This would give much more individualized results for each particular product, and is a way you could offer product recommendations to address some of the customer's concerns and improve your product moving forward.
 
