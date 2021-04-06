@@ -26,13 +26,32 @@ dateVariable <- Sys.Date()
 dateVariable <-  format(dateVariable, format = "%B %d, %Y")
 
 # custom theme
-theme_jacob <- function () { 
-  theme_minimal(base_size=9, base_family="Gill Sans MT") %+replace% 
-    theme(
-      panel.grid.minor = element_blank(),
-      plot.background = element_rect(fill = 'floralwhite', color = 'floralwhite')
-    )
+theme_jacob <- function(..., base_size = 11) {
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major =  element_line(color = "#d0d0d0"),
+        panel.background = element_rect(fill = "#f0f0f0", color = NA),
+        plot.background = element_rect(fill = "#f0f0f0", color = NA),
+        legend.background = element_rect(fill = '#f0f0f0', color = NA),
+        legend.position = 'top',
+        panel.border = element_blank(),
+        strip.background = element_blank(),
+        plot.margin = margin(0.5, 1, 0.5, 1, unit = "cm"),
+        axis.ticks = element_blank(),
+        text = element_text(family = "Gill Sans MT", size = base_size),
+        axis.text = element_text(face = "bold", color = "grey40", size = base_size),
+        axis.title = element_text(face = "bold", size = rel(1.2)),
+        axis.title.x = element_text(margin = margin(0.5, 0, 0, 0, unit = "cm")),
+        axis.title.y = element_text(margin = margin(0, 0.5, 0, 0, unit = "cm"), angle = 90),
+        plot.title = element_text(face = "bold", size = rel(1.67), hjust = 0.52, margin = margin(0, 0, .2, 0, unit = 'cm')),
+        plot.title.position = "plot",
+        plot.subtitle = element_text(size = 11, margin = margin(0, 0, 0.2, 0, unit = "cm"), hjust = 0.5),
+        plot.caption = element_text(size = 10, margin = margin(1, 0, 0, 0, unit = "cm"), hjust = 1),
+        strip.text = element_text(size = rel(1.05), face = "bold"),
+        strip.text.x = element_text(margin = margin(0.1, 0, 0.1, 0, "cm")),
+        ...
+  )
 }
+theme_set(theme_jacob())
 
 
 # loading data in and formatting it ----
@@ -45,11 +64,14 @@ df2 <- df %>%
          HelpVotes = helpful_votes, TotalVotes = total_votes, 
          VerifiedPurchase = verified_purchase, Headline = review_headline,
          Review = review_body, Date = review_date) %>%
-  filter(!is.na(Date))
-df2$Date <- mdy(df2$Date)
-df2 <- as.data.frame(df2)
-str(df2)
+  filter(!is.na(Date)) %>%
+  mutate(review_id = row_number(),
+         Date = mdy(Date))
 
+rm(df)
+
+
+## EDA ----
 skim(df2)
 # Top 10 Customers
 df2 %>%
@@ -76,58 +98,13 @@ df2ratings <- df2 %>%
 ggplot(df2, aes(x = Rating)) +
   geom_histogram() +
   scale_y_continuous(labels = comma) +
-  labs(title = 'Amazon Rating Counts') +
-  theme_jacob()
-ggsave("amazonratingcounts.png", width = 9, height = 4)
+  labs(title = 'Amazon Rating Counts', 
+       y = NULL)
+ggsave("amazonratingcounts.png", width = 15, height = 9)
 
-head(df2$Review)
-
-# specific product titles
-df2GTAV <- df2 %>%
-  filter(Title == 'Grand Theft Auto V')
-ggplot(df2GTAV, aes(x = Rating)) +
-  geom_histogram() +
-  scale_y_continuous(labels = comma) +
-  labs(title = 'GTA V Ratings') +
-  theme_jacob()
-
-df2PS3 <- df2 %>%
-  filter(Title == 'PlayStation 4 500GB Console [Old Model]') %>%
-  group_by(Date) %>%
-  summarise(Count = n())
-
-ggplot(df2PS3, aes(x = Rating)) +
-  geom_histogram() +
-  scale_y_continuous(labels = comma) +
-  labs(title = 'PS3 Ratings') +
-  theme_jacob()
-
-
-# list of every columns na values.
-colSums(is.na(df2))
-
-ggplot(df2, aes(Date)) +
-  geom_bar() +
-  scale_y_continuous(labels = comma) +
-  scale_x_date(date_breaks = "4 months", date_labels = "%b %Y") +
-  theme_jacob()
-
-df2Feb <- df2 %>%
-  filter(month(Date) == '2')
-
-df2Months <- df2 %>%
-  mutate(Month = yearmonth(Date)) %>%
-  group_by(Month) %>%
-  summarise(Count = n())
-
-df2days <- df2 %>%
-  group_by(Date) %>%
-  summarise(Count = n()) %>%
-  mutate(impDate = ifelse(Count %in% tail(sort(Count), 10), 'Important Date', " "))
-
-# time series graph ----
+# time series graph 
 ggplot(df2days, aes(Date, Count, fill = impDate)) +
-  geom_bar(stat = 'identity', width = 1.2) +
+  geom_col(show.legend = FALSE, width = 1.2) +
   scale_y_continuous(labels = comma) +
   scale_fill_manual(values = c("#969696", "#de2d26")) +
   scale_x_date(date_breaks = "4 months", date_labels = "%b %Y") +
@@ -138,19 +115,22 @@ ggplot(df2days, aes(Date, Count, fill = impDate)) +
   labs(title = "Count of Amazon Video Game Reviews", 
        subtitle = "Data Ranging from Dec. 2012 - Aug. 2015",
        x = "Date", 
-       y = "Total Reviews", 
-       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = "")) +
-  theme_jacob() +
-  theme(plot.title = element_text(face = 'bold', hjust = .5), 
-        plot.subtitle = element_text(hjust = .5), 
-        legend.position = 'none') 
-ggsave("amazonreviews.png", width = 9, height = 4)
+       y = "Total Reviews",
+       fill = NULL)
+ggsave("amazonreviews.png", width = 15, height = 9)
 str(df2days)
 
-
-
-
 # Forecasting next 12 months of Number of Reviews ----
+df2Months <- df2 %>%
+  mutate(Month = yearmonth(Date)) %>%
+  group_by(Month) %>%
+  summarise(Count = n())
+
+df2days <- df2 %>%
+  group_by(Date) %>%
+  summarise(Count = n()) %>%
+  mutate(impDate = ifelse(Count %in% tail(sort(Count), 10), 'Important Date', " "))
+
 dfForecast <- as_tsibble(df2)
 dfForecast <- df2Months %>%
   as_tsibble(index = Month)
@@ -171,13 +151,12 @@ fc <- pfit %>%
 pfit %>%
   forecast(h = 12) %>%
   autoplot(dfForecast) +
-  scale_x_date(date_breaks = "4 months", date_labels = "%b %Y") +
-  theme_jacob() +
+  # scale_x_date(date_breaks = "4 months", date_labels = "%b %Y") +
   xlab("Year") + ylab("Count") +
   ggtitle("Number of Monthly Amazon Reviews for Video Game Related Products") +
-  labs(subtitle = 'Exponential Smoothing Forecast (Damped Trend + Seasonality)') +
-  theme_jacob()
-ggsave('amazonexponentialsmoothing.png', width = 9, height = 4)
+  labs(subtitle = 'Exponential Smoothing Forecast (Damped Trend + Seasonality)')
+
+ggsave('amazonexponentialsmoothing.png', width = 15, height = 9)
 
 # ARIMA
 fit_arima <- dfForecast %>%
@@ -190,12 +169,11 @@ augment(fit_arima) %>%
 fit_arima %>%
   forecast(h = 12) %>%
   autoplot(dfForecast) +
-  scale_x_date(date_breaks = "4 months", date_labels = "%b %Y") +
+  # scale_x_date(date_breaks = "4 months", date_labels = "%b %Y") +
   xlab("Year") + ylab("Count") +
   ggtitle("Number of Monthly Amazon Reviews for Video Game Related Products") +
-  labs(subtitle = 'Auto ARIMA Forecast') +
-  theme_jacob()
-ggsave('amazonautoarima.png', width = 9, height = 4)
+  labs(subtitle = 'Auto ARIMA Forecast')
+ggsave('amazonautoarima.png', width = 15, height = 9)
   
 # maybe do tidy text on ratings = 1 vs ratings = 5
 # maybe model help ratings number of help votes vs number of words in the text????????
@@ -208,10 +186,28 @@ df2lowRatings <- df2 %>%
 df2highRatings <- df2 %>%
   filter(Rating == 5)
 
-# Tidy text stuff on Review Body ----
+# Tidytext stuff on Review Body ----
 dfWords <- df2 %>%
   dplyr::select(Review) %>%
   unnest_tokens(word, Review)
+
+bb <- df2 %>%
+  mutate(general_rating = case_when(Rating > 3 ~ "good",
+                                    TRUE ~ "bad")) %>%
+  select(review_id, Review, general_rating) %>%
+  unnest_tokens(word, Review) %>%
+  group_by(review_id) %>%
+  mutate(word_count = n())
+
+bb %>%
+  filter(word_count <= 250) %>%
+  ggplot(aes(word_count, fill = general_rating)) +
+  geom_histogram(bins = 50, color = 'black') %>%
+  facet_wrap(~general_rating)
+
+hh <- bb %>%
+  group_by(review_id) %>%
+  count(word)
 
 # a lot of stop words in the top 15 
 dfWords %>%
@@ -224,8 +220,7 @@ dfWords %>%
   coord_flip() +
   labs(x = "Count",
        y = "Unique words",
-       title = "Count of unique words found in tweets") +
-  theme_jacob()
+       title = "Count of unique words found in tweets")
 
 # filter out the stop words (in, of, as, the etc.)
 data(stop_words)
@@ -246,11 +241,7 @@ dfWords %>%
   coord_flip() +
   labs(y = "Count",
        x = "Unique Words",
-       title = "Top 25 Most Popular Words",
-       subtitle = 'Video Game Product Reviews on Amazon',
-       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = "")) +
-  theme_jacob()
-ggsave('amazontop25wordsReviews.png', width = 9, height = 4)
+       title = "Top 25 Most Popular Words")
 
 
 # bigram stuff
@@ -278,18 +269,18 @@ head(bigram_counts, 15)
 bigrams_united <- bigrams_filtered %>%
   unite(bigram, word1, word2, sep = " ")
 
-# Word Network Graph - Picture 2
-bigram_counts %>%
-  filter(n >= 20) %>%
-  graph_from_data_frame() %>%
-  ggraph(layout = "fr") +
-  geom_node_point(color = "darkslategray4", size = 3) +
-  geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
-  labs(title = "Most Popular Word Pairs",
-       subtitle = "Text Mining with Amazon Review Data",
-       x = "", y = "") +
-  theme_jacob()
-ggsave('amazonwordpairs.png', width = 9, height = 4)
+bigram_graph <- bigram_counts %>%
+  filter(n >= 15) %>%
+  graph_from_data_frame()
+
+ggraph(bigram_graph, layout = "fr") +
+  geom_edge_link(aes(edge_alpha = n), show.legend = FALSE,
+                 arrow = grid::arrow(type = "closed", length = unit(.15, "inches")), end_cap = circle(.07, 'inches')) +
+  geom_node_point(color = "lightblue", size = 5) +
+  geom_node_text(aes(label = name), vjust = 1, hjust = 1) +
+  labs(title = 'Popular Word Pairs in Amazon Reviews')
+ggsave('amazon_bigrams2.png', width = 25, height = 12)
+
 
 # filter out any noticeable sentiment word that is out of place here
 bing_word_counts <- dfWords %>%
@@ -306,12 +297,11 @@ bing_word_counts %>%
   ggplot(aes(word, n, fill = sentiment)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~sentiment, scales = "free_y") +
-  labs(y = "Top 15 Most Popular Words Tweeted by Each Sentiment",
-       x = NULL, 
-       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = ""))  +
-  coord_flip() +
-  theme_jacob()
-ggsave('amazontop15Bing.png', width = 9, height = 4)
+  labs(title = "Top 15 Most Popular Words Tweeted by Each Sentiment",
+       x = NULL,
+       y = 'Word Count') +
+  coord_flip()
+ggsave('amazontop15Bing.png', width = 15, height = 9)
 
 dfWords %>%
   count(word) %>%
@@ -322,8 +312,7 @@ dfWords %>%
   count(word, sentiment, sort = TRUE) %>%
   acast(word ~ sentiment, value.var = "n", fill = 0) %>%
   comparison.cloud(colors = c("red", "blue"),
-                   max.words = 100) +
-  theme_jacob()
+                   max.words = 100)
 
 # word Counts
 word_counts <- dfWords %>%
@@ -356,8 +345,7 @@ dfWordsHeadline %>%
   coord_flip() +
   labs(x = "Count",
        y = "Unique words",
-       title = "Count of unique words found in tweets") +
-  theme_jacob()
+       title = "Count of unique words found in tweets")
 
 # filter out the stop words (in, of, as, the etc.)
 data(stop_words)
@@ -378,9 +366,7 @@ dfWordsHeadline %>%
   coord_flip() +
   labs(y = "Count",
        x = "Unique words",
-       title = "Top 25 Most Popular Words",
-       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = "")) +
-  theme_jacob()
+       title = "Top 25 Most Popular Words")
 
 
 # filter out any noticeable sentiment word that is out of place here
@@ -398,11 +384,10 @@ bing_word_counts_headline %>%
   ggplot(aes(word, n, fill = sentiment)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~sentiment, scales = "free_y") +
-  labs(y = "Top 15 Most Popular Words Tweeted by Each Sentiment",
-       x = NULL, 
-       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = ""))  +
-  coord_flip() +
-  theme_jacob()
+  labs(title = "Top 15 Most Popular Words Tweeted by Each Sentiment",
+       x = NULL,
+       y = 'Count')  +
+  coord_flip()
 
 # all 3 sentiments at once
 afinn <- dfWordsHeadline %>%
@@ -456,10 +441,8 @@ afinnbad %>%
   labs(y = "Count",
        x = "Unique Words",
        title = "Top 25 Most Popular Words in Review Headlines",
-       subtitle = 'AFINN Sentiment Analysis - Negative Words',
-       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = "")) +
-  theme_jacob()
-ggsave('amazonnegativewords.png', width = 9, height = 4)
+       subtitle = 'AFINN Sentiment Analysis - Negative Words')
+ggsave('amazonnegativewords.png', width = 15, height = 9)
 
 # top 25words graph - Picture 1
 afinngood %>%
@@ -473,38 +456,76 @@ afinngood %>%
   labs(y = "Count",
        x = "Unique Words",
        title = "Top 25 Most Popular Words in Review Headlines",
-       subtitle = 'AFINN Sentiment Analysis - Positive Words',
-       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = "")) +
-  theme_jacob()
-ggsave('amazonpositivewords.png', width = 9, height = 4)
+       subtitle = 'AFINN Sentiment Analysis - Positive Words')
+ggsave('amazonpositivewords.png', width = 15, height = 9)
 
+##### ggraph and igraph try
+df2_rating_bigrams <- df2 %>%
+  mutate(id = row_number())
 
-# Lasso Machine Learning ----
-# loading in data and unnesting it
+df2_rating_ids <- df2_rating_bigrams %>%
+  select(id, Rating)
+
+df_tokenized <- df2_rating_bigrams %>%
+  unnest_tokens(word, Review) %>%
+  anti_join(stop_words, by = 'word') %>%
+  inner_join(df2_rating_ids, by = 'id')
+head(df_tokenized)
+
+df_tokenized_clean <- df_tokenized %>%
+  group_by(word) %>%
+  summarize(number = n(),
+            reviews = n_distinct(id),
+            avg_rating = mean(Rating.y)) %>%
+  arrange(desc(number))
+
+df_words_filtered <- df_tokenized_clean %>%
+  filter(reviews > 5000, number > 5000)
+
+word_cors <- df_tokenized %>%
+  semi_join(df_words_filtered, by = 'word') %>%
+  distinct(id, word) %>%
+  pairwise_cor(word, id, sort = TRUE)
+
+filtered_cors <- word_cors %>%
+  head(125)
+
+nodes <- df_words_filtered %>%
+  filter(word %in% filtered_cors$item1 | word %in% filtered_cors$item2)
+set.seed(2020)
+word_cors %>%
+  head(125) %>%
+  graph_from_data_frame(vertices = nodes) %>%
+  ggraph() +
+  geom_edge_link() +
+  geom_node_point(aes(size = reviews * 6.0)) +
+  geom_node_point(aes(size = reviews, color = avg_rating)) +
+  geom_node_text(aes(label = name), repel = TRUE) +
+  scale_color_gradient2(low = 'red', high = 'blue', midpoint = 4) +
+  scale_size_continuous(label = comma) +
+  theme_void() +
+  labs(color = 'Average Rating',
+       size = 'Number of Reviews',
+       title = 'Network of Most Popular Word Pairs in Video Game Product Amazon Reviews',
+       subtitle = 'Data from Dec. 2012 - Aug. 2015')
+ggsave('amazonggraphnew.png', width = 30, height = 9)
+
+#############################################################################################
+
+# tidymodels ----
+set.seed(3031)
 reviews_parsed <- df2 %>%
   mutate(review_id = row_number(),
          general_rating = case_when(Rating > 3 ~ "good",
-                            TRUE ~ "bad"))
+                                    TRUE ~ "bad")) %>%
+  filter(Rating != 3) %>% # removing average ratings - it noticeably increases prediction accuracy 
+  group_by(general_rating) %>%
+  slice_sample(n = 5000) %>% # 5000 reviews each 
+  ungroup()
 
-words_per_review <- reviews_parsed %>%
-  unnest_tokens(word, Review) %>%
-  count(review_id, name = "total_words")
-
-words_per_review %>%
-  ggplot(aes(total_words)) +
-  geom_histogram(fill = 'midnight blue', alpha = 0.8, color = 'black') +
-  scale_x_continuous(limits = c(0, 250)) +
-  labs(title = "Number of Words Distribution", 
-       subtitle = "Amazon Review Data Ranging from Dec. 2012 - Aug. 2015",
-       x = "Total Words", 
-       y = "Count", 
-       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = "")) +
-  theme_jacob()
-ggsave('AmazonHistogramWords.png', width = 9, height = 4)
-
-
-reviews_parsed <- as_tibble(reviews_parsed) %>%
-  slice(1:100000)
+reviews_parsed %>%
+  group_by(general_rating) %>%
+  count()
 
 # preprocessing
 set.seed(123)
@@ -517,100 +538,252 @@ review_rec <- recipe(general_rating ~ Review, data = review_train) %>%
   step_stopwords(Review) %>%
   step_tokenfilter(Review, max_tokens = 500) %>%
   step_tfidf(Review) %>%
-  step_normalize(all_predictors())
+  step_normalize(all_predictors(), -all_outcomes())
 
-review_prep <- prep(review_rec) # implements the recipe
+# model building
+log_spec <- logistic_reg() %>%
+  set_engine(engine = "glm") %>%
+  set_mode('classification')
 
-review_prep
-juice(review_prep)
+rf_spec <- rand_forest() %>% 
+  set_engine("ranger", importance = "impurity") %>% 
+  set_mode("classification")
 
-# model building - selecting logistic regresssion
-lasso_spec <- logistic_reg(penalty = tune(), mixture = 1) %>%
-  set_engine("glmnet")
+xgb_spec <- boost_tree() %>% 
+  set_engine("xgboost") %>% 
+  set_mode("classification") 
 
-lasso_wf <- workflow() %>%
+knn_spec <- nearest_neighbor(neighbors = 8) %>% # can adjust the number of neighbors 
+  set_engine("kknn") %>% 
+  set_mode("classification") 
+
+log_wf <- workflow() %>%
   add_recipe(review_rec) %>%
-  add_model(lasso_spec)
-lasso_wf
+  add_model(log_spec)
 
-# tuning parameters
-lambda_grid <- grid_regular(penalty(), levels = 40)
 
-set.seed(123)
-review_folds <- bootstraps(review_train, strata = general_rating)
-review_folds
+rf_wf <- workflow() %>%
+  add_recipe(review_rec) %>% 
+  add_model(rf_spec) 
 
-set.seed(2020)
-lasso_grid <- tune_grid(
-  lasso_wf,
-  resamples = review_folds,
-  grid = lambda_grid,
-  metrics = metric_set(roc_auc, ppv, npv)
-)
-lasso_grid
+xgb_wf <- workflow() %>%
+  add_recipe(review_rec) %>% 
+  add_model(xgb_spec)
 
-lasso_grid %>%
-  collect_metrics()
+knn_wf <- workflow() %>%
+  add_recipe(review_rec) %>% 
+  add_model(knn_spec)
 
-lasso_grid %>% # we are looking for the peaks in all 3 variables, npv still has some left to go.
-  collect_metrics() %>%
-  ggplot(aes(penalty, mean, color = .metric)) +
-  geom_line(size = 1.5, legend = FALSE) +
-  facet_wrap(~.metric) +
-  scale_x_log10() +
-  theme_jacob()
+set.seed(100)
+cv_folds <- vfold_cv(review_train, v = 5, strata = general_rating) 
 
-best_ppv <- lasso_grid %>%
-  select_best("ppv")
+get_model <- function(x) {
+  pull_workflow_fit(x) %>% tidy()
+}
 
-best_ppv
+log_res <- log_wf %>% 
+  fit_resamples(
+    resamples = cv_folds, 
+    metrics = metric_set(
+      recall, precision, f_meas, 
+      accuracy, kap,
+      roc_auc, sens, spec),
+    control = control_resamples(
+      save_pred = TRUE,
+      extract = get_model))
 
-final_lasso <- finalize_workflow(lasso_wf, best_ppv)
-final_lasso
+rf_res <- rf_wf %>% 
+  fit_resamples(
+    resamples = cv_folds, 
+    metrics = metric_set(
+      recall, precision, f_meas, 
+      accuracy, kap,
+      roc_auc, sens, spec),
+    control = control_resamples(save_pred = TRUE)) 
 
-final_lasso_data <- final_lasso %>%
-  fit(review_train) %>%
+xgb_res <- xgb_wf %>% 
+  fit_resamples(
+    resamples = cv_folds, 
+    metrics = metric_set(
+      recall, precision, f_meas, 
+      accuracy, kap,
+      roc_auc, sens, spec),
+    control = control_resamples(save_pred = TRUE)) 
+
+knn_res <- knn_wf %>% 
+  fit_resamples(
+    resamples = cv_folds, 
+    metrics = metric_set(
+      recall, precision, f_meas, 
+      accuracy, kap,
+      roc_auc, sens, spec),
+    control = control_resamples(save_pred = TRUE)) 
+
+## collecting results
+log_metrics <- 
+  log_res %>% 
+  collect_metrics(summarise = TRUE) %>%
+  mutate(model = "Logistic Regression") # add the name of the model to every row
+
+rf_metrics <- 
+  rf_res %>% 
+  collect_metrics(summarise = TRUE) %>%
+  mutate(model = "Random Forest")
+
+xgb_metrics <- 
+  xgb_res %>% 
+  collect_metrics(summarise = TRUE) %>%
+  mutate(model = "XGBoost")
+
+knn_metrics <- 
+  knn_res %>% 
+  collect_metrics(summarise = TRUE) %>%
+  mutate(model = "Knn")
+
+model_compare <- bind_rows(
+  log_metrics,
+  rf_metrics,
+  xgb_metrics,
+  knn_metrics) 
+
+## conf matrixes
+log_res %>% 
+  collect_predictions() %>%
+  conf_mat(general_rating, .pred_class) 
+
+rf_res %>% 
+  collect_predictions() %>%
+  conf_mat(general_rating, .pred_class) 
+
+xgb_res %>% 
+  collect_predictions() %>%
+  conf_mat(general_rating, .pred_class) 
+
+knn_res %>% 
+  collect_predictions() %>%
+  conf_mat(general_rating, .pred_class) 
+
+log_res %>% 
+  collect_predictions() %>%
+  roc_curve(general_rating, .pred_bad) %>% 
+  autoplot()
+
+log_roc <- log_res %>% 
+  collect_predictions() %>%
+  mutate(Model = 'Logistic Regression')
+
+rf_roc <- rf_res %>% 
+  collect_predictions() %>%
+  mutate(Model = 'Random Forest')
+
+xgb_roc <- xgb_res %>% 
+  collect_predictions() %>%
+  mutate(Model = 'XGBoost')
+
+knn_roc <- knn_res %>% 
+  collect_predictions() %>%
+  mutate(Model = 'KNN')
+
+all <- log_roc %>%
+  rbind(rf_roc) %>%
+  rbind(xgb_roc) %>%
+  rbind(knn_roc)
+
+all %>% 
+  group_by(Model) %>%
+  roc_curve(general_rating, .pred_bad) %>% 
+  autoplot() +
+  labs(title = 'Model Performance Comparison')
+ggsave('amazon_roc.png', width = 15, height = 9)
+
+
+# change data structure
+model_comp <- model_compare %>% 
+  select(model, .metric, mean, std_err) %>% 
+  pivot_wider(names_from = .metric, values_from = c(mean, std_err)) 
+
+model_comp %>% 
+  arrange(mean_f_meas) %>% 
+  mutate(model = fct_reorder(model, mean_f_meas)) %>% # order results
+  ggplot(aes(model, mean_f_meas, fill=model)) +
+  geom_col(color = 'black') +
+  coord_flip() +
+  geom_text(size = 3, aes(label = round(mean_f_meas, 2), y = mean_f_meas + 0.08), vjust = 1) +
+  labs(x = NULL,
+       y = 'F1-Score',
+       title = 'Best Models') +
+  theme(legend.position = 'none')
+
+model_comp %>% 
+  arrange(mean_roc_auc) %>% 
+  mutate(model = fct_reorder(model, mean_roc_auc)) %>%
+  ggplot(aes(model, mean_roc_auc, fill=model)) +
+  geom_col(color = 'black') +
+  coord_flip() +
+  geom_text(size = 3, aes(label = round(mean_roc_auc, 2), y = mean_roc_auc + 0.08), vjust = 1) +
+  labs(x = NULL,
+       y = 'Mean AUC',
+       title = 'Best Models') +
+  theme(legend.position = 'none')
+
+model_comp %>% slice_max(mean_f_meas)
+
+last_fit_log <- last_fit(log_wf, 
+                        split = review_split,
+                        metrics = metric_set(
+                          recall, precision, f_meas, 
+                          accuracy, kap,
+                          roc_auc, sens, spec))
+
+last_fit_rf <- last_fit(rf_wf, 
+                         split = review_split,
+                         metrics = metric_set(
+                           recall, precision, f_meas, 
+                           accuracy, kap,
+                           roc_auc, sens, spec))
+
+last_fit_log %>% 
+  collect_metrics() %>%# .842 f score
+  select(-.estimator, -.config) %>%
+  mutate(.metric = fct_reorder(.metric, .estimate)) %>%
+  ggplot(aes(.estimate, .metric, label = round(.estimate, 3))) +
+  geom_col() +
+  geom_text(aes(.estimate, .metric), hjust = -0.25) +
+  labs(x = 'Coefficient Value',
+       y = NULL,
+       title = 'Final Performance Metrics on Testing Set')
+ggsave('amazon_metrics.png', width = 15, height = 9)
+
+last_fit_rf %>%
+  collect_metrics() # .832 f score
+
+last_fit_log %>%
+  collect_predictions() %>%
+  conf_mat(general_rating, .pred_class) %>%
+  autoplot(type = "heatmap")
+ggsave('amazon_heatmap.png', height = 5, width = 9)
+
+last_fit_rf %>%
+  collect_predictions() %>%
+  conf_mat(general_rating, .pred_class) %>%  
+  autoplot(type = "heatmap") # heat map confirms logistic regression a tad better.
+  
+last_fit_log %>%
+  pluck(".workflow", 1) %>% 
   pull_workflow_fit() %>%
-  vi(lambda = best_ppv$penalty)
-
-final_lasso_data %>%
+  vi(lambda = best_auc$penalty) %>%
   group_by(Sign) %>%
-  top_n(20, wt = abs(Importance)) %>%
+  top_n(30, wt = abs(Importance)) %>%
   ungroup() %>%
-  mutate(Importance = abs(Importance),
-         Variable = str_remove(Variable, "tfidf_Review_"),
-         Variable = fct_reorder(Variable, Importance)) %>%
+  mutate(
+    Importance = abs(Importance),
+    Variable = str_remove(Variable, "tfidf_Review_"),
+    Variable = fct_reorder(Variable, Importance)
+  ) %>%
   ggplot(aes(x = Importance, y = Variable, fill = Sign)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~Sign, scales = "free_y") +
-  labs(title = "LASSO Regression Results", 
-       subtitle = "Ranking the Importance of Words Leading to Positive or Negative Reviews",
-       x = "Importance", 
-       y = "Word", 
-       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = "")) +
-  theme_jacob()
-ggsave('AmazonLASSO.png', width = 9, height = 4)
-
-review_final <- last_fit(final_lasso, review_split)
-
-review_final %>%
-  collect_metrics()
-
-review_final %>%
-  collect_predictions() %>%
-  conf_mat(general_rating, .pred_class)
-
-conf_matrix <- review_final %>%
-  collect_predictions() %>%
-  conf_mat(general_rating, .pred_class)
-
-autoplot(conf_matrix, type = "heatmap") +
-  labs(title = "LASSO Regression Confusion Matrix", 
-       subtitle = "79% Overall Accuracy",
-       x = "Actual", 
-       y = "Predicted", 
-       caption = paste('Data via AWS Public Dataset Domain on ', dateVariable, sep = "")) +
-  theme_jacob() +
-  theme(legend.position = 'none')
-ggsave('AmazonLASSOcm.png', width = 9, height = 4)
-
+  labs(y = NULL,
+       x = 'Importance (TF-IDF)',
+       title = 'Which Words lead to Positive or Negative Reviews?')
+ggsave('amazon_importance.png', width = 15, height = 9)
