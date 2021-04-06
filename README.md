@@ -63,7 +63,7 @@ I also wanted to conduct Machine Learning to try and predict Ratings based on wh
 
 Below are a list of the steps taken using the Tidymodels package to conduct Machine Learning and try to predict good or bad reviews.  These steps extract the text from the reviews, removes stop words, selects 500 of the most important words when taking into account their tf-idf scores, and normalizes the data to have a standard deviation of 1 and a mean of 0.  The data was split into 75% Training Data, 25% Testing Data.  I also performed K-fold Cross Validation with 5 folds, and stratified both the folds and the training data by general_rating to make sure the proportions of the outcome variable were the same.
 
-![amazon workflow](https://user-images.githubusercontent.com/16946556/81755962-3504a900-946f-11ea-8835-c5d07ca19eb5.png)
+![amazon_wf](https://user-images.githubusercontent.com/16946556/113769534-ee96e900-96d5-11eb-9750-d20364c8bf07.png)
 
 Below is an ROC Curve comparing the results of the 4 models.  Logistic Regression and Random Forest models stand out and are virtually the same in terms of predictive power.  XGBoost and KNN were lagging behind in their performance.
 
