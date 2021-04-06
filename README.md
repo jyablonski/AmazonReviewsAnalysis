@@ -10,7 +10,7 @@ I also built an interactive [R Shiny Dashboard](https://jyablonski.shinyapps.io/
 ## Exploratory Analysis
 This is just a simple (daily) time series of the data, the red lines represent the spikes which typically occur in December & January after the Holiday Season.  There's also a general upward trend as time increases from Amazon becoming more and more popular over the decade.  These spikes & the general upward trend are pretty normal & exactly what we would expect to see.
 
-![amazonreviews](https://user-images.githubusercontent.com/16946556/75714753-246ed000-5c81-11ea-8c7a-ef3c175e144e.png)
+![amazonreviews](https://user-images.githubusercontent.com/16946556/113646472-bba11680-963d-11eb-94e7-2b42fa009f42.png)
 
 Using basic dplyr I found a quick top 10 count for the top products & the most frequent reviewers.  I also contemplated filtering specific Titles that were popular (Products like the PlayStation 4 or games like Grand Theft Auto: V) which could have interesting results if you're interested in analyzing a certain product.
 
@@ -20,7 +20,7 @@ Using basic dplyr I found a quick top 10 count for the top products & the most f
 
 Here is the distribution of the Rating Counts in the dataset, along with the actual numbers & percentages listed below.  Over 78% of the ratings were 4 or 5 stars, and the two least popular choices were 2 & 3 star ratings.  This seems pretty ordinary for rating data, customers tend to gravitate to the extreme ends of voicing their pleasure or displeasure when it comes to recommending a product to other people.
 
-![amazonratingcounts](https://user-images.githubusercontent.com/16946556/77356708-16522380-6d04-11ea-8a51-9bc24239c76b.png)
+![amazonratingcounts](https://user-images.githubusercontent.com/16946556/113646470-bba11680-963d-11eb-8ab3-379da23f10d7.png)
 ![rating counts imgur](https://user-images.githubusercontent.com/16946556/77356710-16eaba00-6d04-11ea-98d0-b7f984f1c8b3.png)
 
 Below is a distribution of the total number of words in each review.  Users typically tend to keep it short, with the majority of reviews containing less than 50 words.  
@@ -33,7 +33,7 @@ I then performed Sentiment Analysis and analyzed the top 25 words in the bodies 
 
 ![amazontop25wordsReviews](https://user-images.githubusercontent.com/16946556/75707751-57f72d80-5c74-11ea-8588-4a98a78d4624.png)
 
-![amazontop15Bing](https://user-images.githubusercontent.com/16946556/75707757-59c0f100-5c74-11ea-8808-b8cae7c365dd.png)
+![amazontop15Bing](https://user-images.githubusercontent.com/16946556/113646462-ba6fe980-963d-11eb-8136-bae26ac663eb.png)
 
 The AFINN Sentiment is another way of splitting words up by applying a value of -5 (most negative) to 5 (most positive) to each word that is analyzed.  Here i'm just separating them into 2 distinct categories and trying to spot any obvious differences because positive reviews can be quite different than negative ones.  Words that got assigned values of -5 and 5 were extremely rare and difficult to conduct any meaningful analysis on because of the small sample size
 
@@ -46,7 +46,7 @@ Here is a simple wordcloud of the most popular positive & negative words.  The m
 
 
 This is a full bigram plot using the ggraph package utilizing the entire dataset.  I recommend clicking on it and zooming it, but these are the most commonly associated word pairs in the body text of these Amazon Reviews, colored by their average rating.  
-![amazonggraphnew](https://user-images.githubusercontent.com/16946556/84967500-f21a9e80-b0c8-11ea-86af-f5f26575fed3.png)
+![amazonggraphnew](https://user-images.githubusercontent.com/16946556/113646467-bb088000-963d-11eb-98e0-6cfcdb8d64c5.png)
 
 
 ## LASSO Regression
@@ -70,8 +70,20 @@ I also wanted to work with forecasting a bit to see if I could predict future va
 The original dataset stopped in August 2015, so I forecasted the next year (12 periods) of Amazon Reviews.
 
 The AUTO ARIMA forecast provided (1, 0 ,0) (0, 1, 0) model, indicating there is an autoregressive component and a seasonal component included in the model.
-![amazonautoarima](https://user-images.githubusercontent.com/16946556/75707752-59285a80-5c74-11ea-8ee0-585e1cbd118c.png)
+![amazonautoarima](https://user-images.githubusercontent.com/16946556/113646461-ba6fe980-963d-11eb-830d-f7097642d8f3.png)
 
-![amazonexponentialsmoothing](https://user-images.githubusercontent.com/16946556/75707753-59285a80-5c74-11ea-8d17-ed225f31399d.png)
+![amazonexponentialsmoothing](https://user-images.githubusercontent.com/16946556/113646459-b9d75300-963d-11eb-99ca-25f9e2a88a20.png)
 
-There was an obvious trend in the data as well as seasonality around the Holiday Season, so both of these aspects were included in the two final models.  
+There was an obvious trend in the data as well as seasonality around the Holiday Season, so both of these aspects were included in the two final models. 
+
+
+
+![amazonpositivewords](https://user-images.githubusercontent.com/16946556/113646463-ba6fe980-963d-11eb-8092-1e7ea0ece498.png)
+![amazonnegativewords](https://user-images.githubusercontent.com/16946556/113646464-ba6fe980-963d-11eb-865b-41ab9a2ceba2.png)
+![amazon_importance](https://user-images.githubusercontent.com/16946556/113646465-bb088000-963d-11eb-8fb1-2f4f73885dc5.png)
+![amazon_heatmap](https://user-images.githubusercontent.com/16946556/113646466-bb088000-963d-11eb-9727-b7a0a6dcae86.png)
+
+![amazonwordpairs](https://user-images.githubusercontent.com/16946556/113646469-bba11680-963d-11eb-8eb1-8c912d23a65e.png)
+
+
+
