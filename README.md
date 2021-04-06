@@ -24,7 +24,7 @@ Here is the distribution of the Rating Counts in the dataset, along with the act
 
 Below is a distribution of the total number of words in each review.  Users typically tend to keep it short, with the majority of reviews containing less than 50 words.  
 
-![AmazonHistogramWords](https://user-images.githubusercontent.com/16946556/81755474-b9eec300-946d-11ea-9395-2fc25db1909e.png)
+![amazon_words](https://user-images.githubusercontent.com/16946556/113767475-94952400-96d3-11eb-855f-9f7d60ba60b0.png)
 
 
 ## Sentiment Analysis
