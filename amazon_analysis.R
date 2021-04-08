@@ -25,6 +25,7 @@ library(tidymodels)
 dateVariable <- Sys.Date()
 dateVariable <-  format(dateVariable, format = "%B %d, %Y")
 
+
 # custom theme
 theme_jacob <- function(..., base_size = 11) {
   theme(panel.grid.minor = element_blank(),
